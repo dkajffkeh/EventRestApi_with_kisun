@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Event {
 
+    private Integer id;
+
     private String name;
     private String description;
     private LocalDateTime beginEnrollmentDateTime;
@@ -22,7 +24,6 @@ public class Event {
     private int basePrice; // (optional)
     private int maxPrice; // (optional)
     private int limitOfEnrollment;
-    private Integer id;
     private boolean offline;
     private boolean free;
     private EventStatus eventStatus = EventStatus.DRAFT;
