@@ -1,6 +1,5 @@
 package me.patrick.eventrest.events;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +9,7 @@ class EventTest {
 
     @Test
     @DisplayName("Event Not Null Test")
-    public void builder(){
+    void builder(){
         Event event = Event.builder().build();
         assertThat(event).isNotNull();
     }
