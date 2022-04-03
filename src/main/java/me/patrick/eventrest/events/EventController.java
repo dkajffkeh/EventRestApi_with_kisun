@@ -3,6 +3,7 @@ package me.patrick.eventrest.events;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import me.patrick.eventrest.repository.EventRepository;
+import me.patrick.eventrest.validator.EventValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +26,16 @@ public class EventController {
     private final EventRepository eventRepository;
     private final ModelMapper modelMapper;
 
+    private final EventValidator eventValidator;
+
     @PostMapping
     public ResponseEntity createEvent(@RequestBody @Valid EventParam eventParam, Errors errors){
 
+        if(errors.hasErrors()){
+            return ResponseEntity.badRequest().build();
+        }
+
+        eventValidator.validate(eventParam,errors);
         if(errors.hasErrors()){
             return ResponseEntity.badRequest().build();
         }
