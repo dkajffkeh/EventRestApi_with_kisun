@@ -10,7 +10,7 @@ class EventTest {
     @Test
     @DisplayName("Event Not Null Test")
     void builder(){
-        Event event = Event.builder().build();
+        EventParam event = EventParam.builder().build();
         assertThat(event).isNotNull();
     }
 
