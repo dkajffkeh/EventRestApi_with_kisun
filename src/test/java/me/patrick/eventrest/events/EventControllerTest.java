@@ -1,23 +1,30 @@
 package me.patrick.eventrest.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import me.patrick.eventrest.repository.EventRepository;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.hateoas.MediaTypes.HAL_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
-@WebMvcTest(controllers = EventController.class)
+@WebMvcTest
 public class EventControllerTest {
 
     @Autowired
@@ -26,10 +33,14 @@ public class EventControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
+    @MockBean
+    EventRepository eventRepository;
+
     @Test
     void createEvent() throws Exception {
         // given
         Event event = Event.builder()
+                .id(10)
                 .name("Spring")
                 .description("REST API Development with Spring")
                 .beginEnrollmentDateTime(LocalDateTime.of(2018,11,23,14,21))
@@ -45,6 +56,7 @@ public class EventControllerTest {
                 .offline(false)
                 .build();
 
+        Mockito.when(eventRepository.save(any(Event.class))).thenReturn(event);
 
         mockMvc.perform(post("/api/events/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -52,7 +64,11 @@ public class EventControllerTest {
                         .content(objectMapper.writeValueAsString(event)))
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("id").exists());
+                .andExpect(jsonPath("id").exists())
+                .andExpect(header().exists(HttpHeaders.LOCATION))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))
+                .andExpect(jsonPath("id").value(Matchers.not(100)))
+                .andExpect(jsonPath("free").value(Matchers.not(true)));
     }
 
 
