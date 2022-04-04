@@ -105,7 +105,7 @@ public class EventControllerTest {
     }
 
     @Test
-    @TestDescription("WrongInput 핸들링 테스트")
+    @DisplayName("입력 입력이 잘못된 경우에 에러가 발생하는 테스트")
     void createEvent_BadRequest_Wrong_Input() throws Exception {
 
         EventParam eventParam = EventParam.builder()
@@ -126,7 +126,11 @@ public class EventControllerTest {
                         .accept(HAL_JSON)
                         .content(objectMapper.writeValueAsString(eventParam)))
                 .andDo(print())
-                .andExpect(status().isBadRequest());
-
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$[0].objectName").exists())
+                .andExpect(jsonPath("$[0].field").exists())
+                .andExpect(jsonPath("$[0].defaultMessage").exists())
+                .andExpect(jsonPath("$[0].code").exists())
+                ;
     }
 }
