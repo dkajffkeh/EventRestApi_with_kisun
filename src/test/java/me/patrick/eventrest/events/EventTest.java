@@ -1,21 +1,19 @@
 package me.patrick.eventrest.events;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EventTest {
 
     @Test
-    @DisplayName("Event Not Null Test")
-    void builder(){
+    public void builder(){
         EventParam event = EventParam.builder().build();
         assertThat(event).isNotNull();
     }
 
     @Test
-    void javaBean(){
+    public void javaBean(){
 
         String name ="Event";
         String description = "Spring";

@@ -1,16 +1,12 @@
 package me.patrick.eventrest.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import me.patrick.eventrest.common.TestDescription;
-import me.patrick.eventrest.repository.EventRepository;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -24,6 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 @SpringBootTest
 public class EventControllerTest {
@@ -35,7 +32,7 @@ public class EventControllerTest {
     ObjectMapper objectMapper;
 
     @Test
-    void createEvent() throws Exception {
+    public void createEvent() throws Exception {
         // given
         EventParam eventParam = EventParam.builder()
                 .name("Spring")
@@ -57,13 +54,18 @@ public class EventControllerTest {
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(header().exists(HttpHeaders.LOCATION))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("id").exists())
-                .andExpect(jsonPath("free").value(Matchers.not(true)));
+                .andExpect(jsonPath("free").value(Matchers.not(true)))
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.query-events").exists())
+                .andExpect(jsonPath("_links.update-event").exists())
+        ;
+
     }
 
     @Test
-    void createEvent_BadRequest() throws Exception {
+    public void createEvent_BadRequest() throws Exception {
         // given
         Event event = Event.builder()
                 .id(100)
@@ -90,8 +92,7 @@ public class EventControllerTest {
     }
 
     @Test
-    @DisplayName("BadRequest 핸들링 테스트")
-    void createEvent_BadRequest_Empty_Input() throws Exception {
+    public void createEvent_BadRequest_Empty_Input() throws Exception {
 
         EventParam eventParam = EventParam.builder().build();
 
@@ -105,8 +106,7 @@ public class EventControllerTest {
     }
 
     @Test
-    @DisplayName("입력 입력이 잘못된 경우에 에러가 발생하는 테스트")
-    void createEvent_BadRequest_Wrong_Input() throws Exception {
+    public void createEvent_BadRequest_Wrong_Input() throws Exception {
 
         EventParam eventParam = EventParam.builder()
                 .name("Spring")
